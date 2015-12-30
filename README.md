@@ -8,11 +8,11 @@
 
 ## Design Draft
 ### Version 0.1
-For Server:
+#### For Server:
     * Local IPv4 address, Port 9000.
     * `select()` to handle <b>I/O Multiplexing</b>.
     * Keep all clients' username.
-For Client:
+#### For Client:
     * Local IPv4 address, Port unspecified;
     * Register a username.
 
