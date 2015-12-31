@@ -27,7 +27,8 @@ void addregclient(int cli_fd);
 void multicast(int cli_fd, int maxfd);
 
 unsigned int serv_fd;
-fd_set read_fds; // socket set for reading
+int maxfd;
+fd_set all_fds; // socket set for reading
 fd_set reg_fds; // set for registered clients' sockets
 /* unsigned char bitmap[MAXCLIENT >> 3]; */
 
@@ -54,26 +55,34 @@ void init() {
     Bind(serv_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     Listen(serv_fd, LISTENQ); // backlog = LISTENQ(1024)
 
-    FD_ZERO(&read_fds);
+    FD_ZERO(&all_fds);
     FD_ZERO(&reg_fds);
-    FD_SET(serv_fd, &read_fds);
+    FD_SET(serv_fd, &all_fds);
 
     /* bzero(bitmap, MAXCLIENT); */
 }
 
 void service() {
-    int maxfd = serv_fd;
+    maxfd = serv_fd;
     int sel_fd;
     while (1) {
-        sel_fd = Select(maxfd + 1, &read_fds, NULL, NULL, NULL);
-        if (sel_fd == serv_fd) { // new client comes
-            addnewclient();
-        }
-        else if (!FD_ISSET(sel_fd, &reg_fds)) { // new registered client
-            addregclient(sel_fd);
-        }
-        else { // message comes
-            multicast(sel_fd, maxfd);
+        fd_set read_fds = all_fds;
+        Select(maxfd + 1, &read_fds, NULL, NULL, NULL);
+        for (sel_fd = 0; sel_fd <= maxfd; sel_fd++) {
+            if (!FD_ISSET(sel_fd, &read_fds))
+                continue;
+            if (sel_fd == serv_fd) { // new client comes
+                addnewclient();
+                break;
+            }
+            else if (!FD_ISSET(sel_fd, &reg_fds)) { // new registered client
+                addregclient(sel_fd);
+                break;
+            }
+            else { // message comes
+                multicast(sel_fd, maxfd);
+                break;
+            }
         }
     }
 }
@@ -89,7 +98,9 @@ void addnewclient() {
         Care that length of your name should be less than 8 characters.\n");
     Writen(cli_fd, buf, strlen(buf));
 
-    FD_SET(cli_fd, &read_fds);
+    if (maxfd < cli_fd)
+        maxfd = cli_fd;
+    FD_SET(cli_fd, &all_fds);
 }
 
 void addregclient(int cli_fd) {
@@ -97,7 +108,7 @@ void addregclient(int cli_fd) {
     int len;
 
     bzero(buf, MAXBUFLENGTH);
-    if ((len = Readn(cli_fd, &buf, MAXBUFLENGTH)) > 8) { // length of nick name cannot > 8
+    if ((len = Read(cli_fd, &buf, MAXBUFLENGTH)) > 8) { // length of nick name cannot > 8
         strcpy(buf, "Illegal nick name.\n\
             Care that length of your name should be less than 8 characters.\n");
         Writen(cli_fd, buf, strlen(buf));
@@ -118,8 +129,11 @@ void multicast(int cli_fd, int maxfd) {
     int len;
     char buf[MAXBUFLENGTH];
 
-    if ((len = Readn(cli_fd, &buf, MAXBUFLENGTH)) == 0) { // EOF
+    bzero(buf, MAXBUFLENGTH);
+    if ((len = Read(cli_fd, &buf, MAXBUFLENGTH)) == 0) { // EOF
         printf("Client %d leaves.\n", cli_fd);
+        FD_CLR(cli_fd, &all_fds);
+        FD_CLR(cli_fd, &reg_fds);
     }
     else {
         for (; loop_fd <= maxfd; loop_fd++) {

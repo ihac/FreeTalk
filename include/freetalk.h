@@ -27,6 +27,7 @@ int Select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,\
 int Close(int sockfd);
 
 ssize_t Readn(int fd, void *buff, size_t nbytes);
+ssize_t Read(int fd, void *buff, size_t nbytes);
 ssize_t Written(int fd, const void *buff, size_t nbytes);
 
 static void err_doit(int errnoflag, int error, const char *fmt, va_list ap);
