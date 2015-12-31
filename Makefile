@@ -1,9 +1,16 @@
 CC=gcc
-CFLAGS=-I.
-DEPS=freetalk.h
+IDIR=include
+SDIR=src
+ODIR=tmp
+CFLAGS=-I$(IDIR)
 
-%.o: %.c $(DEPS)
+_DEPS=freetalk.h
+_OBJ=server.o wrapper.o myerr.o
+DEPS=$(patsubst %, $(IDIR)/%, $(_DEPS))
+OBJ=$(patsubst %, $(ODIR)/%, $(_OBJ))
+
+$(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-server: wrapper.o server.o myerr.o
-	$(CC) -o server wrapper.o myerr.o server.o $(CFLAGS)
+server: $(OBJ)
+	$(CC) -o $@ $(OBJ) $(CFLAGS)
