@@ -24,7 +24,7 @@
 * Register a nickname.
 
 #### Bug Fix:
-1. Sometimes when a client leaves before he/her register a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
+1. Sometimes when a client leaves before he/her registers a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
 ```
 // Fix in addregclient():
     ...

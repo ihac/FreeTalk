@@ -16,16 +16,6 @@
 /* #include <netdb.h> */
 /* #include <netinet/in.h> */
 
-#define SERV_PORT 9000
-#define MAXBUFLENGTH 512
-#define MAXCLIENT 512
-
-void init();
-void service();
-void addnewclient();
-void addregclient(int cli_fd);
-void multicast(int cli_fd, int maxfd);
-
 unsigned int serv_fd;
 int maxfd;
 fd_set all_fds; // socket set for reading

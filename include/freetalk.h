@@ -14,9 +14,30 @@
 /* Macro */
 #define MAXLINE 4096
 #define LISTENQ 1024
+#define SERV_PORT 9000
+#define MAXBUFLENGTH 512
+#define MAXCLIENT 512
+#define MAXNICKNAME 8
 
+// error num
+#define FULLARRAY -1
+#define CONFLICTNAME -2
 
 /* Function Prototype */
+
+// server.c
+void init();
+void service();
+void newClient();
+void regClient(int cli_fd);
+void multicast(int cli_fd, int maxfd);
+
+// cliInfo.c
+int addClient(int clifd, char *nickname);
+int findPos();
+
+
+// wrapper.c
 int Socket(int family, int type, int protocol);
 int Connect(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen);
 int Bind(int sockfd, const struct sockaddr *myaddr, socklen_t addrlen);
