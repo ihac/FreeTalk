@@ -115,6 +115,7 @@ void addregclient(int cli_fd) {
     }
     else if (len == 0) { // EOF, client send a FIN package
         printf("Client %d leaves.\n", cli_fd);
+        FD_CLR(cli_fd, &all_fds);
     }
     else { // legal nick name. Now, register for the client
         strcpy(buf, "Congurations! You are registered now.\n\

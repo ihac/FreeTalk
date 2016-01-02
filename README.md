@@ -24,6 +24,15 @@
 * Register a nickname.
 
 #### Bug Fix:
-1. Sometimes when a client leaves, server runs into a dead loop and keep printing 'Client * leaves'.
-
+1. Sometimes when a client leaves before he/her register a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
+```
+// Fix in addregclient():
+    ...
+    else if (len == 0) { // EOF, client send a FIN package
+        printf("Client %d leaves.\n", cli_fd);
+        ++FD_CLR(cli_fd, &all_fds);
+    }
+    ...
+// when a client leaves, we should clear it from the socket set.
+```
 ## User Guide
