@@ -10,7 +10,7 @@
 
 ## Design Draft
 
-### Version 0.1
+### Version 1.0
 
 #### For Server:
 
@@ -22,5 +22,8 @@
 
 * Local IPv4 address, Port unspecified;
 * Register a nickname.
+
+#### Bug Fix:
+1. Sometimes when a client leaves, server runs into a dead loop and keep printing 'Client * leaves'.
 
 ## User Guide
