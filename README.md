@@ -24,9 +24,9 @@
 * Register a nickname.
 
 #### Bug Fix:
-1. Sometimes when a client leaves before he/her registers a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
+1. When a client leaves before he/her registers a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
 ```
-// Fix in addregclient():
+// Fix in cliInfo.c_addregclient():
     ...
     else if (len == 0) { // EOF, client send a FIN package
         printf("Client %d leaves.\n", cli_fd);
@@ -34,5 +34,14 @@
     }
     ...
 // when a client leaves, we should clear it from the socket set.
+```
+2. After I add `Client Nickname Display` function, clients receive some older message.
+```
+// Fix in server.c_multicast():
+    ...
+    char prefix_buf[MAXBUFLENGTH];
+    ++bzero(prefix_buf, sizeof(prefix_buf));
+    ...
+// Keep in mind that every time we declare a buffer memory, we should set it all zero.
 ```
 ## User Guide

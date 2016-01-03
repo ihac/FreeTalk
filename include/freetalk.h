@@ -22,6 +22,7 @@
 // error num
 #define FULLARRAY -1
 #define CONFLICTNAME -2
+#define CLIENTNOTFOUND -1
 
 /* Function Prototype */
 
@@ -33,7 +34,9 @@ void regClient(int cli_fd);
 void multicast(int cli_fd, int maxfd);
 
 // cliInfo.c
-int addClient(int clifd, char *nickname);
+int addClient(int cli_fd, char *nickname);
+int delClient(int cli_fd);
+const char *getName(int cli_fd);
 int findPos();
 
 

@@ -7,7 +7,7 @@ CFLAGS=-I$(IDIR)
 CLEANFILES=server tmp/*
 
 _DEPS=freetalk.h
-_OBJ=server.o wrapper.o myerr.o
+_OBJ=server.o wrapper.o myerr.o cliInfo.o
 DEPS=$(patsubst %, $(IDIR)/%, $(_DEPS))
 OBJ=$(patsubst %, $(ODIR)/%, $(_OBJ))
 
