@@ -25,7 +25,7 @@
 
 #### Bug Fix:
 
-1. When a client leaves before he/her registers a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
+- When a client leaves before he/her registers a nickname, server runs into a dead loop and keep printing 'Client * leaves'.
 
 ```
 // Fix in cliInfo.c_addregclient():
@@ -38,7 +38,7 @@
 // when a client leaves, we should clear it from the socket set.
 ```
 
-2. After I add `Client Nickname Display` function, clients receive some older message.
+- After I add `Client Nickname Display` function, clients receive some older message.
 
 ```
 // Fix in server.c_multicast():
@@ -47,6 +47,21 @@
     ++bzero(prefix_buf, sizeof(prefix_buf));
     ...
 // Keep in mind that every time we declare a buffer memory, we should set it all zero.
+```
+- Clients received a message like this:
+
+```
+someone
+ say: hello, there.
+```
+
+This weird message occured because server had never removed `\r\n` or `\n` which was appended to nickname automatically.
+Fix the bug as below:
+
+```
+    ++while (buf[len] != '\r' && buf[len] != '\n')
+    ++    len++;
+    ++buf[len] = 0; // terminate when '\r' or '\n' is found.
 ```
 
 ## User Guide

@@ -85,7 +85,8 @@ void newClient() {
 
     bzero(buf, MAXBUFLENGTH);
     // Take care that strcpy() is unsafe
-    strcpy(buf, "Please choose a nick name.\nCare that length of your name should be less than 8 characters.\n");
+    strcpy(buf, "Please choose a nick name.\n"
+            "Care that length of your name should be less than 8 characters.\n");
     Writen(cli_fd, buf, strlen(buf));
 
     if (maxfd < cli_fd)
@@ -95,12 +96,18 @@ void newClient() {
 
 void regClient(int cli_fd) {
     char buf[MAXBUFLENGTH];
-    int len;
+    int len = 0;
 
     bzero(buf, MAXBUFLENGTH);
-    if ((len = Read(cli_fd, &buf, MAXBUFLENGTH)) > 8) { // length of nick name cannot > 8
+
+    Read(cli_fd, &buf, MAXBUFLENGTH);
+    while (buf[len] != '\r' && buf[len] != '\n')
+        len++;
+    buf[len] = 0; // terminate when '\r' or '\n' is found.
+    if (--len > 8) { // length of nick name cannot > 8
         // Take care that strcpy() is unsafe
-        strcpy(buf, "Illegal nick name.\nCare that length of your name should be less than 8 characters.\n");
+        strcpy(buf, "Illegal nick name.\n"
+                "Care that length of your name should be less than 8 characters.\n");
         Writen(cli_fd, buf, strlen(buf));
     }
     else if (len == 0) { // EOF, client send a FIN package
@@ -109,18 +116,21 @@ void regClient(int cli_fd) {
     }
     else { // legal nick name. Now, register for the client
         // add client sockfd in register socket set
+        addClient(cli_fd, buf);
         FD_SET(cli_fd, &reg_fds);
         // save client name and sockfd
         int save_res = addClient(cli_fd, buf);
         if (save_res == 0) { // register succssed
             // send message
             // Take care that strcpy() is unsafe
-            strcpy(buf, "Congurations! You are registered now.\nPlease feel free in talk.\n");
+            strcpy(buf, "Congurations! You are registered now.\n"
+                    "Please feel free in talk.\n");
             Writen(cli_fd, buf, strlen(buf));
         }
         else if (save_res == FULLARRAY) { // save failed
             // Take care that strcpy() is unsafe
-            strcpy(buf, "Sorry, chat room is a little busy.\nPlease try to connect after a while.\n");
+            strcpy(buf, "Sorry, chat room is a little busy.\n"
+                    "Please try to connect after a while.\n");
             FD_CLR(cli_fd, &all_fds);
             close(cli_fd);
         }

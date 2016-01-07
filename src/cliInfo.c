@@ -10,7 +10,7 @@
 /* #include "../include/freetalk.h" */
 #include "freetalk.h"
 
-char cliName[MAXCLIENT][MAXNICKNAME]; // client nickname
+char cliName[MAXCLIENT][MAXNICKNAME + 1]; // client nickname
 int cliID[MAXCLIENT]; // client socket ID
 
 static unsigned char bitmap[MAXCLIENT >> 3]; // bitmap of client array
@@ -26,6 +26,7 @@ int addClient(int cli_fd, char *nickname) {
         bitmap_tmp <<= 1;
         i++;
     }
+    bitmap[index] |= (0x80 >> i);
 
     index = (index << 3) + i;
     strncpy(cliName[index], (const char *)nickname, strlen(nickname));
